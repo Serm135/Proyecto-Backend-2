@@ -82,31 +82,6 @@ export const register = async (req,res) => {
                         res.status(404).json('El Email ya se encuentra usado')
                     }
                 })
-                const salt = crypto.randomBytes(16).toString('hex')
-                const hash = crypto.pbkdf2Sync(data.password,salt,1000,64,'sha512').toString('hex')
-                console.log(hash)
-                const newuser = new User({
-                    username: data.username,
-                    password: hash,
-                    salt:salt,
-                    email: data.email,
-                    birthdate: data.birthdate,
-                    bio: data.bio
-                })
-                newuser.save().then(result =>{
-                    console.log("Éxito "+result)
-                    const accessToken = generateAccessToken(data.username)
-                    console.log(accessToken)
-                    res.header('authorization',accessToken).json({
-                    message:'Usuario autenticado',
-                    token:accessToken
-                })
-                }).catch(e=>{
-                    console.log(e)
-                    res.status(500).json({
-                        error:e
-                    })
-                })
             }else{
                 res.status(404).json('El Email ya se encuentra usado')
             }
