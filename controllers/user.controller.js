@@ -15,7 +15,6 @@ export const login = async (req,res) => {
                 User.find({username:data.username,password: hash}).then(dataDB=>{
                 if(dataDB!=''){
                     accessToken = generateAccessToken(data.username)
-                    console.log(accessToken)
                     res.header('authorization',accessToken).json({
                         message:'Usuario autenticado',
                         token:accessToken
@@ -68,7 +67,6 @@ export const register = async (req,res) => {
                         newuser.save().then(result =>{
                             console.log("Éxito "+result)
                             accessToken = generateAccessToken(data.username)
-                            console.log(accessToken)
                             res.header('authorization',accessToken).json({
                             message:'Usuario autenticado',
                             token:accessToken
