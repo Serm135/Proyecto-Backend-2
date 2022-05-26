@@ -4,6 +4,6 @@ import * as followController from '../controllers/follow.controller.js'
 const router = Router();
 
 router.get('/following',followController.following)
-//router.get('/followers',followController.followers)
+router.get('/followers',followController.followers)
 
 export default router;
