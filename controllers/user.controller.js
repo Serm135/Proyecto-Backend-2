@@ -3,6 +3,7 @@ import jwt from 'jsonwebtoken'
 import dotenv from 'dotenv'
 import crypto from 'crypto'
 
+global.accessToken = ''
 dotenv.config()
 
 export const login = async (req,res) => {
@@ -13,7 +14,8 @@ export const login = async (req,res) => {
                 const hash = crypto.pbkdf2Sync(data.password,dataDB[0].salt,1000,64,'sha512').toString('hex')
                 User.find({username:data.username,password: hash}).then(dataDB=>{
                 if(dataDB!=''){
-                    const accessToken = generateAccessToken(data.username)
+                    accessToken = generateAccessToken(data.username)
+                    console.log(accessToken)
                     res.header('authorization',accessToken).json({
                         message:'Usuario autenticado',
                         token:accessToken
@@ -55,7 +57,6 @@ export const register = async (req,res) => {
                     if(dataDB==''){
                         const salt = crypto.randomBytes(16).toString('hex')
                         const hash = crypto.pbkdf2Sync(data.password,salt,1000,64,'sha512').toString('hex')
-                        console.log(hash)
                         const newuser = new User({
                             username: data.username,
                             password: hash,
@@ -66,7 +67,7 @@ export const register = async (req,res) => {
                         })
                         newuser.save().then(result =>{
                             console.log("Éxito "+result)
-                            const accessToken = generateAccessToken(data.username)
+                            accessToken = generateAccessToken(data.username)
                             console.log(accessToken)
                             res.header('authorization',accessToken).json({
                             message:'Usuario autenticado',
@@ -79,7 +80,7 @@ export const register = async (req,res) => {
                             })
                         })
                     }else{
-                        res.status(404).json('El Email ya se encuentra usado')
+                        res.status(404).json('El Username ya se encuentra usado')
                     }
                 })
             }else{
@@ -96,7 +97,9 @@ export const register = async (req,res) => {
     }
 };
 
+
 function generateAccessToken(user){
-    return jwt.sign(user,process.env.SECRET)
+    return jwt.sign(JSON.stringify(user),process.env.SECRET)
 }
 
+//export default { accessToken: accessToken } 
