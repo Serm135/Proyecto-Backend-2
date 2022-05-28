@@ -12,7 +12,7 @@ export const create = async (req,res) => {
         })
         console.log(newPost)
         newPost.save().then(result => {
-            res.json({})
+            res.status(202).json({})
         }).catch(e=>{
                 console.log(e)
                 res.status(500).json({
@@ -26,7 +26,7 @@ export const create = async (req,res) => {
 }
 export const information = async (req,res) => {
     const data = req.body
-    if (data.post_id) {
+    if (data.post_id.length==24) {
         await Post.findOne({_id:data.post_id}).then(dataDB => {
             if (dataDB) {
                 const post_info = {
@@ -47,6 +47,33 @@ export const information = async (req,res) => {
                 })
             })
     }else{
-        res.status(404).json('Faltan campos por llenar')
+        res.status(404).json('No se encontró la publicación')
+    }
+}
+export const like = async (req, res) =>{
+    const data = req.body
+    if (data.post_id.length==24) {
+        await Post.findOne({_id:data.post_id}).then(dataDB => {
+            if (dataDB) {
+                let likes = dataDB.likes
+                const user = "jhonnaar"
+                if (!likes.find(like =>{return like==user})) {
+                    likes.push(user)
+                    Post.updateOne({_id:data.post_id},{$set:{likes:likes}}).then(r =>{
+                        res.status(202).json({})
+                    }).catch(e =>{
+                        console.log(e)
+                        res.status(404)
+                    })
+                } else {
+                    res.status(404).json('Ya dio like a esta publicación')
+                }
+                
+            } else {
+                res.status(404).json('No se encontró la publicación')
+            }
+        })
+    } else {
+        res.status(404).json('No se encontró la publicación')
     }
 }
