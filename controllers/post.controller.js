@@ -1,4 +1,6 @@
 import Post from "../models/post.model.js"
+import jwtDecode from 'jwt-decode'
+import User from '../models/user.model.js'
 
 export const create = async (req,res) => {
     const data = req.body
@@ -6,9 +8,7 @@ export const create = async (req,res) => {
         const newPost = new Post({
             author: data.author,
             img_url: data.img_url,
-            bio: data.bio,
-            likes: [],
-            comments:[]
+            bio: data.bio
         })
         console.log(newPost)
         newPost.save().then(result => {
@@ -52,28 +52,66 @@ export const information = async (req,res) => {
 }
 export const like = async (req, res) =>{
     const data = req.body
-    if (data.post_id.length==24) {
-        await Post.findOne({_id:data.post_id}).then(dataDB => {
+    if (accessToken!="") {
+        if (data.post_id.length==24) {
+            await Post.findOne({_id:data.post_id}).then(dataDB => {
+                if (dataDB) {
+                    let likes = dataDB.likes
+                    try {
+                        var decoded = jwtDecode(accessToken)
+                    } catch (error) {
+                        console.log(error)
+                        res.status(404).json(error)
+                    }
+                    if (!likes.find(like =>{return like==decoded})) {
+                        likes.push(decoded)
+                        Post.updateOne({_id:data.post_id},{$set:{likes:likes}}).then(r =>{
+                            res.status(202).json({})
+                        }).catch(e =>{
+                            console.log(e)
+                            res.status(404)
+                        })
+                    } else {
+                        res.status(404).json('Ya dio like a esta publicación')
+                    }
+                    
+                } else {
+                    res.status(404).json('No se encontró la publicación')
+                }
+            })
+        } else {
+            res.status(404).json('No se encontró la publicación')
+        }
+    } else {
+        res.status(404).json('Debe estar logueado')
+    }
+}
+export const liked_by = async (req, res) => {
+    const data = req.query
+    if (data.user_id!="") {
+        await User.findOne({_id:data.user_id}).then(dataDB => {
             if (dataDB) {
-                let likes = dataDB.likes
-                const user = "jhonnaar"
-                if (!likes.find(like =>{return like==user})) {
-                    likes.push(user)
-                    Post.updateOne({_id:data.post_id},{$set:{likes:likes}}).then(r =>{
-                        res.status(202).json({})
-                    }).catch(e =>{
-                        console.log(e)
-                        res.status(404)
+                if (dataDB.likeallowed) {
+                    Post.find().then(posts => {
+                        if (posts) {
+                            let likedposts = posts.filter(post => {
+                                if (post.likes.find(like=>{return like==dataDB.username})) {
+                                    return post
+                                }
+                            })
+                            res.status(202).json(likedposts)
+                        } else {
+                            res.status(404).json({})
+                        } 
                     })
                 } else {
-                    res.status(404).json('Ya dio like a esta publicación')
+                    res.status(404).json('El usuario no permite ver sus "me gusta"')
                 }
-                
             } else {
-                res.status(404).json('No se encontró la publicación')
+                res.status(404).json('No se encontró al usuario')
             }
         })
     } else {
-        res.status(404).json('No se encontró la publicación')
+        res.status(404).json('User id incorrecto')
     }
-}
+} 

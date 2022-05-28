@@ -7,7 +7,9 @@ const userSchema = new mongoose.Schema({
     email: {type: String, required:true},
     birthdate: {type: String, required:true},
     bio: {type: String, required:true},
-    followed:[{type: String}]
+    followed:[{type: String}],
+    likeallowed: {type: Boolean, required:true},
+    publicaciones: [{type: String}]
 },{versionKey:false})
 
 export default mongoose.model('user', userSchema);
