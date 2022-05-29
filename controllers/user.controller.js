@@ -62,7 +62,9 @@ export const register = async (req,res) => {
                             salt:salt,
                             email: data.email,
                             birthdate: data.birthdate,
-                            bio: data.bio
+                            bio: data.bio,
+                            likeallowed: true,
+                            savedposts:[]
                         })
                         newuser.save().then(result =>{
                             console.log("Éxito "+result)
