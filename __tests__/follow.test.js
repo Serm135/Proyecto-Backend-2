@@ -3,7 +3,7 @@ import requestdb from '../models/request.model.js'
 import request from 'supertest';
 import mongoose from "mongoose";
 
-describe("user route tests", () => {
+describe("follow route tests", () => {
     beforeAll(() => {
         const url = "mongodb+srv://pinilloss:gokuque@cluster0.49scg.mongodb.net/picshar-db?retryWrites=true&w=majority"
         mongoose.connect(url);
