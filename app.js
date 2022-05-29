@@ -13,5 +13,8 @@ app.use(express.json())
 app.use('/users',userRoutes)
 app.use('/posts',postRoutes)
 app.use('/follows',followRoutes)
+app.use(async (req, res) => {
+    res.status(404).json({message: "Not found."})
+});
 
 export default app

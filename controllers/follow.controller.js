@@ -14,10 +14,11 @@ export const following = async (req,res) => {
         if(data.user_id){
             await User.findOne({_id:data.user_id}).then(dataDB=>{
                 if(dataDB){
+                    const users = dataDB.followed
                     if(dataDB.username==decoded){
-                        res.status(202).send(dataDB.followed)
+                        res.status(202).json({message:'Ok',users})
                     }else if((dataDB.followed).find(item=>item=decoded)){
-                        res.status(202).send(dataDB.followed)
+                        res.status(202).json({message:'Ok',users})
                     }else{
                         res.status(404).json('El usuario no lo sigue')
                     }
@@ -51,7 +52,7 @@ export const followers = async (req,res) => {
                     if(dataDB.username==decoded){
                         User.find({followed:dataDB.username}).then(dataDBf=>{
                             const users = dataDBf.map(item=>item.username)
-                            res.status(202).send(users)
+                            res.status(202).json({message:'Ok',users})
                         }).catch(e=>{
                             console.log(e)
                             res.status(404).json(e)
@@ -59,7 +60,7 @@ export const followers = async (req,res) => {
                     }else if((dataDB.followed).find(item=>item=decoded)){
                         User.find({followed:dataDB.username}).then(dataDBf=>{
                             const users = dataDBf.map(item=>item.username)
-                            res.status(202).send(users)
+                            res.status(202).json({message:'Ok',users})
                         }).catch(e=>{
                             console.log(e)
                             res.status(404).json(e)
@@ -78,6 +79,7 @@ export const followers = async (req,res) => {
             res.status(404).json('Falta user_id')
         }
     }else{
+        
         res.status(404).json('Token error')
     }
 }
@@ -96,14 +98,14 @@ export const request = async(req,res) => {
                 if(dataDB){
                     if(dataDB.username!=decoded){
                         if((dataDB.followed).find(item=>item=decoded)){
-                            res.status(404).json('Ya se encuentra siguiendo al usuario')
+                            res.status(404).json({message:'Ya se encuentra siguiendo al usuario'})
                         }else{
                             const newreq = new Request({
                                 from: decoded,
                                 to: dataDB.username
                             })
-                            newreq.save().then(result=>{
-                                res.status(202).json('Realizado Correctamente')
+                            newreq.save().then(r=>{
+                                res.status(202).json({message:'Realizado Correctamente'})
                             }).catch(e=>{
                                 console.log(e)
                                 res.status(500).json({
@@ -112,17 +114,17 @@ export const request = async(req,res) => {
                             })
                         }
                     }else{
-                        res.status(404).json('Solicitud incorrecta')
+                        res.status(404).json({message:'Solicitud incorrecta'})
                     }
                 }else{
-                    res.status(404).json('No se encontró el usuario')
+                    res.status(404).json({message:'No se encontró el usuario'})
                 }
             }).catch(e=>{
                 console.log(e)
                 res.status(404).json(e)
             })
         }else{
-            res.status(404).json('Falta user_id')
+            res.status(404).json({message:'Falta user_id'})
         }
     }else{
         res.status(404).json('Token error')
@@ -145,7 +147,7 @@ export const response = async(req,res) => {
                         if(data.action=='accept'){ 
                             User.updateOne({username:dataDB.from},{$push:{followed:[dataDB.to]}}).then(result=>{
                                 Request.deleteOne({from:dataDB.from},{to:dataDB.to}).then(
-                                    res.status(202).json('Realizado Correctamente')
+                                    res.status(202).json({message:'Realizado Correctamente'})
                                 ).catch(e=>{
                                     console.log(e)
                                     res.status(500).json({
@@ -160,7 +162,7 @@ export const response = async(req,res) => {
                             })
                         }else if(data.action=='reject'){
                             Request.deleteOne({from:dataDB.from},{to:dataDB.to}).then(
-                                res.status(202).json('Realizado Correctamente')
+                                res.status(202).json({message:'Realizado Correctamente'})
                             ).catch(e=>{
                                 console.log(e)
                                 res.status(500).json({
@@ -171,20 +173,20 @@ export const response = async(req,res) => {
                             res.status(404).json('Solicitud incorrecta')
                         }
                     }else{
-                        res.status(404).json('Al usuario no le pertenece esta solicitud')
+                        res.status(404).json({message:'Al usuario no le pertenece esta solicitud'})
                     }
                     
                 }else{
-                    res.status(404).json('No se encontró la petición')
+                    res.status(404).json({message:'Petición no encontrada o respondida'})
                 }
             }).catch(e=>{
                 console.log(e)
                 res.status(404).json(e)
             })
         }else{
-            res.status(404).json('Faltan datos')
+            res.status(404).json({message:'Faltan datos'})
         }
     }else{
-        res.status(404).json('Token error')
+        res.status(404).json({message:'Token error'})
     }
 }

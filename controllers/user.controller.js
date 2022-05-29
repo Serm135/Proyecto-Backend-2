@@ -15,12 +15,12 @@ export const login = async (req,res) => {
                 User.find({username:data.username,password: hash}).then(dataDB=>{
                 if(dataDB!=''){
                     accessToken = generateAccessToken(data.username)
-                    res.header('authorization',accessToken).json({
+                    res.status(202).header('authorization',accessToken).json({
                         message:'Usuario autenticado',
                         token:accessToken
                     })
                 }else{
-                    res.status(404).send([])
+                    res.status(404).send({message:'Contraseña incorrecta'})
                 }
                 }).catch(e=>{
                 console.log(e)
@@ -29,7 +29,7 @@ export const login = async (req,res) => {
                 })
                 })
             }else{
-                res.status(404).json('No se encontró el usuario')
+                res.status(404).json({message:'No se encontró el usuario'})
             }
         })
         
@@ -67,9 +67,8 @@ export const register = async (req,res) => {
                             savedposts:[]
                         })
                         newuser.save().then(result =>{
-                            console.log("Éxito "+result)
                             accessToken = generateAccessToken(data.username)
-                            res.header('authorization',accessToken).json({
+                            res.status(202).header('authorization',accessToken).json({
                             message:'Usuario autenticado',
                             token:accessToken
                         })
@@ -93,7 +92,9 @@ export const register = async (req,res) => {
             })
         })
     }else{
-        res.status(404).json('Faltan campos por llenar')
+        res.status(404).json({
+            message:'Faltan campos por llenar'
+        })
     }
 };
 
@@ -101,5 +102,3 @@ export const register = async (req,res) => {
 function generateAccessToken(user){
     return jwt.sign(JSON.stringify(user),process.env.SECRET)
 }
-
-//export default { accessToken: accessToken } 
