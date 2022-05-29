@@ -4,26 +4,48 @@ import User from '../models/user.model.js'
 
 export const create = async (req,res) => {
     const data = req.body
-    if (data.author && data.img_url && data.bio) {
-        const newPost = new Post({
-            author: data.author,
-            img_url: data.img_url,
-            bio: data.bio,
-            likes:[],
-            comments:[]
-        })
-        newPost.save().then(result => {
-            res.status(202).json({})
-        }).catch(e=>{
-                console.log(e)
-                res.status(500).json({
-                    error:e
-                })
+    if (Object.keys(data).indexOf("comment")<0) {
+        if (data.author && data.img_url && data.bio) {
+            const newPost = new Post({
+                author: data.author,
+                img_url: data.img_url,
+                bio: data.bio,
+                likes:[],
+                comments:[]
             })
-
+            newPost.save().then(result => {
+                res.status(202).json({})
+            }).catch(e=>{
+                    console.log(e)
+                    res.status(500).json({
+                        error:e
+                    })
+                })
+    
+        } else {
+            res.status(404).json('Faltan campos por llenar')
+        }
     } else {
-        res.status(404).json('Faltan campos por llenar')
+        if (data.post_id && data.comment) {
+            await Post.findById(data.post_id).then(dataDB => {
+                let comments = dataDB.comments
+                comments.push(data.comment)
+                Post.updateOne({_id:data.post_id},{$set:{comments:comments}}).then(r =>{
+                    res.status(202).json({})
+                }).catch(e =>{
+                    console.log(e)
+                    res.status(500)
+                })
+            }).catch(e=>{
+                console.log(e)
+                res.status(404)
+            })
+        } else {
+            res.status(404).json('Faltan campos por llenar')
+        }
+        
     }
+    
 }
 export const information = async (req,res) => {
     const data = req.body
