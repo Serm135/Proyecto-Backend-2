@@ -2,7 +2,7 @@ import Post from "../models/post.model.js"
 import jwtDecode from 'jwt-decode'
 import User from '../models/user.model.js'
 
-export const create = async (req,res) => {
+export const create_comment = async (req,res) => {
     const data = req.body
     if (Object.keys(data).indexOf("comment")<0) {
         if (data.author && data.img_url && data.bio) {
@@ -48,30 +48,45 @@ export const create = async (req,res) => {
     
 }
 export const information = async (req,res) => {
-    const data = req.body
-    if (data.post_id.length==24) {
-        await Post.findOne({_id:data.post_id}).then(dataDB => {
-            if (dataDB) {
-                const post_info = {
-                    img_url: dataDB.img_url,
-                    bio: dataDB.bio,
-                    author: dataDB.author,
-                    likes: dataDB.likes.length,
-                    comments: dataDB.comments
+    if (!req.query) {
+        const data = req.body
+        if (data.post_id.length==24) {
+            await Post.findOne({_id:data.post_id}).then(dataDB => {
+                if (dataDB) {
+                    const post_info = {
+                        img_url: dataDB.img_url,
+                        bio: dataDB.bio,
+                        author: dataDB.author,
+                        likes: dataDB.likes.length,
+                        comments: dataDB.comments
+                    }
+                    res.json(post_info)
+                } else {
+                    res.status(404).json('No se encontró la publicación')
                 }
-                res.json(post_info)
-            } else {
-                res.status(404).json('No se encontró la publicación')
-            }
-        }).catch(e=>{
-                console.log(e)
-                res.status(500).json({
-                    error:e
+            }).catch(e=>{
+                    console.log(e)
+                    res.status(500).json({
+                        error:e
+                    })
                 })
+        }else{
+            res.status(404).json('No se encontró la publicación')
+        }
+    } else {
+        const data = req.query
+        if (data.author) {
+            await Post.find({author:data.author}).then(dataDB => {
+                res.status(202).json(dataDB)
+            }).catch(e=>{
+                console.log(e)
+                res.status(404).json(e)
             })
-    }else{
-        res.status(404).json('No se encontró la publicación')
+        } else {
+            res.status(404).json('Faltan campos por llenar')
+        }
     }
+    
 }
 export const like = async (req, res) =>{
     const data = req.body
@@ -200,4 +215,29 @@ export const save = async (req, res) => {
     } else {
         res.status(404).json('Debe estar logueado')
     }
+}
+export const timeline = async (req,res) => {
+    const data = req.body
+    if (accessToken!="") {
+        const page = {
+            page:data.page,
+            size:2
+        }
+        try {
+            var decoded = jwtDecode(accessToken)
+        } catch (error) {
+            console.log(error)
+            res.status(404).json({})
+        }
+        await Post.find({author:decoded}).skip((page.page-1)*page.size).limit(page.size).then(dataDB => {
+            res.status(202).json(dataDB)
+        }).catch(e=>{
+            console.log(e)
+            res.status(404)
+        })
+
+    } else {
+        res.status(404).json('Debe estar logueado')
+    }
+
 }
