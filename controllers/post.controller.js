@@ -8,9 +8,10 @@ export const create = async (req,res) => {
         const newPost = new Post({
             author: data.author,
             img_url: data.img_url,
-            bio: data.bio
+            bio: data.bio,
+            likes:[],
+            comments:[]
         })
-        console.log(newPost)
         newPost.save().then(result => {
             res.status(202).json({})
         }).catch(e=>{
@@ -103,6 +104,9 @@ export const liked_by = async (req, res) => {
                         } else {
                             res.status(404).json({})
                         } 
+                    }).catch(e=>{
+                        console.log(e)
+                        res.status(500).json('Error')
                     })
                 } else {
                     res.status(404).json('El usuario no permite ver sus "me gusta"')
@@ -110,8 +114,68 @@ export const liked_by = async (req, res) => {
             } else {
                 res.status(404).json('No se encontró al usuario')
             }
+        }).catch(e=>{
+            console.log(e)
+            res.status(404).json('No se encontró al usuario')
         })
     } else {
         res.status(404).json('User id incorrecto')
     }
-} 
+}
+export const saved_by = async (req, res) => {
+    if (accessToken!="") {
+        try {
+            var decoded = jwtDecode(accessToken)
+        } catch (error) {
+            console.log(error)
+            res.status(404).json(error)
+        }
+        let savedposts = []
+        await User.findOne({username:decoded}).then(dataDB =>{
+                Post.find().then(posts=>{
+                    dataDB.savedposts.map(post_id => {
+                        posts.map(post=>{
+                            if (post._id==post_id) {
+                                savedposts.push(post)
+                            }
+                        })
+                    })
+                    res.status(202).json(savedposts)
+                }).catch(e=>{
+                    console.log(e)
+                    res.status(404).json('No hay publicaciones')
+                })
+        }).catch(e=>{
+            console.log(e)
+            res.status(500).json('Error')
+        })
+    } else {
+        res.status(404).json('Debe estar logueado')
+    }
+}
+export const save = async (req, res) => {
+    const data = req.body
+    if (accessToken!="") {
+        try {
+            var decoded = jwtDecode(accessToken)
+        } catch (error) {
+            console.log(error)
+            res.status(404).json(error)
+        }
+        await User.findOne({username:decoded}).then(dataDB =>{
+            let saved = dataDB.savedposts
+            saved.push(data.post_id)
+            User.updateOne({_id:dataDB._id},{$set:{savedposts:saved}}).then(r =>{
+                res.status(202).json({})
+            }).catch(e =>{
+                console.log(e)
+                res.status(404)
+            })
+        }).catch(e=>{
+            console.log(e)
+            res.status(500).json('Error')
+        })
+    } else {
+        res.status(404).json('Debe estar logueado')
+    }
+}

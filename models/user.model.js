@@ -9,7 +9,7 @@ const userSchema = new mongoose.Schema({
     bio: {type: String, required:true},
     followed:[{type: String}],
     likeallowed: {type: Boolean, required:true},
-    publicaciones: [{type: String}]
+    savedposts: [{type: String}]
 },{versionKey:false})
 
 export default mongoose.model('user', userSchema);
