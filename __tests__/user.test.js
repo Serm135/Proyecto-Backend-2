@@ -1,10 +1,13 @@
 import app from '../app.js';
 import request from 'supertest';
 import mongoose from "mongoose";
+import dotenv from 'dotenv'
+
+dotenv.config()
 
 describe("user route tests", () => {
     beforeAll(() => {
-        const url = "mongodb+srv://pinilloss:gokuque@cluster0.49scg.mongodb.net/picshar-db?retryWrites=true&w=majority"
+        const url = process.env.DATABASE_URL
         mongoose.connect(url);
     })
 
