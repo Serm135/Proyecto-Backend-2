@@ -70,4 +70,18 @@ describe("user route tests", () => {
         expect(body.message).toBe("Usuario autenticado")
     })
 
+    test('/info', async () => {
+        const user = {
+            user_id: '6292a3cfe25b6e63c08ab029'
+        }
+        const {status, _body: body} = await request(app).get('/users/').send(user)
+        expect(status).toBe(202)    
+        expect(body.message).toBe("Ok")
+        expect(body.info.birthdate).toBeUndefined()
+        expect(body.info.password).toBeUndefined()
+        expect(body.info.posts_count).toBe(1)
+        expect(body.info.liked_count).toBe(1)
+        expect(body.info.followers_count).toBe(0)
+        expect(body.info.followed_count).toBe(1)
+    })
 })
