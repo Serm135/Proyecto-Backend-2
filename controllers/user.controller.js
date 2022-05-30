@@ -121,7 +121,7 @@ export const information = async (req,res) => {
                     followed_count: (dataDB.followed).length
 
                 }
-                res.status(202).json(info)
+                res.status(202).json({message:'Ok',info})
             }).catch(e=>{
                 console.log(e)
             })
