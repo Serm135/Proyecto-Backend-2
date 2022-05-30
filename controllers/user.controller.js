@@ -1,7 +1,9 @@
 import User from '../models/user.model.js'
+import Post from '../models/post.model.js'
 import jwt from 'jsonwebtoken'
 import dotenv from 'dotenv'
 import crypto from 'crypto'
+import mongoose from 'mongoose'
 
 global.accessToken = ''
 dotenv.config()
@@ -64,7 +66,8 @@ export const register = async (req,res) => {
                             birthdate: data.birthdate,
                             bio: data.bio,
                             likeallowed: true,
-                            savedposts:[]
+                            savedposts:[],
+                            followed:[]
                         })
                         newuser.save().then(result =>{
                             console.log("Éxito "+result)
@@ -96,7 +99,38 @@ export const register = async (req,res) => {
         res.status(404).json('Faltan campos por llenar')
     }
 };
+export const information = async (req,res) => {
+    const data = req.body
+    const _id = mongoose.Types.ObjectId(data.user_id)
+    const pipeline = [
+        {$match:{_id:_id}},
+        {$project:{"_id":0,"username":1, "email":1, "bio":1, "followed":1}}
+    ]
+    await User.aggregate(pipeline).then(dataDB => {
+        Post.find().then(posts => {
+            User.find().then(users => {
+                dataDB = dataDB[0]
+                const info = {
+                    username: dataDB.username, 
+                    email: dataDB.email, 
+                    bio: dataDB.bio, 
+                    liked_count: (posts.filter(post=>{return post.likes.includes(dataDB.username)}).length), 
+                    posts_count: (posts.filter(post=>{return post.author==dataDB.username}).length),
+                    followers_count: (users.filter(user=>{return user.followed.includes(dataDB.username)}).length),
+                    followed_count: (dataDB.followed).length
 
+                }
+                res.status(202).json(info)
+            }).catch(e=>{
+                console.log(e)
+            })
+        }).catch(e=>{
+            console.log(e)
+        })
+    }).catch(e=>{
+        console.log(e)
+    })
+}
 
 function generateAccessToken(user){
     return jwt.sign(JSON.stringify(user),process.env.SECRET)
