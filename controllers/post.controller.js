@@ -31,7 +31,7 @@ export const create_comment = async (req,res) => {
                 let comments = dataDB.comments
                 comments.push(data.comment)
                 Post.updateOne({_id:data.post_id},{$set:{comments:comments}}).then(r =>{
-                    res.status(202).json({})
+                    res.status(202).json({message:'Ok'})
                 }).catch(e =>{
                     console.log(e)
                     res.status(500)
@@ -48,7 +48,7 @@ export const create_comment = async (req,res) => {
     
 }
 export const information = async (req,res) => {
-    if (!req.query) {
+    if (!req.query || req.query!='') {
         const data = req.body
         if (data.post_id.length==24) {
             await Post.findOne({_id:data.post_id}).then(dataDB => {
@@ -60,9 +60,9 @@ export const information = async (req,res) => {
                         likes: dataDB.likes.length,
                         comments: dataDB.comments
                     }
-                    res.json(post_info)
+                    res.status(202).json({message:'Ok',post_info})
                 } else {
-                    res.status(404).json('No se encontró la publicación')
+                    res.status(404).json({message:'No se encontró la publicación'})
                 }
             }).catch(e=>{
                     console.log(e)
@@ -71,7 +71,7 @@ export const information = async (req,res) => {
                     })
                 })
         }else{
-            res.status(404).json('No se encontró la publicación')
+            res.status(404).json({message:'No se encontró la publicación'})
         }
     } else {
         const data = req.query
@@ -83,7 +83,7 @@ export const information = async (req,res) => {
                 res.status(404).json(e)
             })
         } else {
-            res.status(404).json('Faltan campos por llenar')
+            res.status(404).json({message:'Faltan campos por llenar'})
         }
     }
     
@@ -177,7 +177,7 @@ export const saved_by = async (req, res) => {
                             }
                         })
                     })
-                    res.status(202).json(savedposts)
+                    res.status(202).json({message:'Ok',savedposts})
                 }).catch(e=>{
                     console.log(e)
                     res.status(404).json('No hay publicaciones')
