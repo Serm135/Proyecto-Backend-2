@@ -110,7 +110,7 @@ export const like = async (req, res) =>{
                             res.status(404)
                         })
                     } else {
-                        res.status(404).json('Ya dio like a esta publicación')
+                        res.status(404).json({message:'Ya dio like a esta publicación'})
                     }
                     
                 } else {
@@ -137,26 +137,26 @@ export const liked_by = async (req, res) => {
                                     return post
                                 }
                             })
-                            res.status(202).json(likedposts)
+                            res.status(202).json({message:'Ok',likedposts})
                         } else {
-                            res.status(404).json({})
+                            res.status(404).json({message:'F'})
                         } 
                     }).catch(e=>{
                         console.log(e)
-                        res.status(500).json('Error')
+                        res.status(500).json({message:'Error'})
                     })
                 } else {
-                    res.status(404).json('El usuario no permite ver sus "me gusta"')
+                    res.status(404).json({message:'El usuario no permite ver sus "me gusta'})
                 }
             } else {
-                res.status(404).json('No se encontró al usuario')
+                res.status(404).json({message:'No se encontró al usuario'})
             }
         }).catch(e=>{
             console.log(e)
-            res.status(404).json('No se encontró al usuario')
+            res.status(404).json({message:'No se encontró al usuario'})
         })
     } else {
-        res.status(404).json('User id incorrecto')
+        res.status(404).json({message:'User id incorrecto'})
     }
 }
 export const saved_by = async (req, res) => {
@@ -203,17 +203,17 @@ export const save = async (req, res) => {
             let saved = dataDB.savedposts
             saved.push(data.post_id)
             User.updateOne({_id:dataDB._id},{$set:{savedposts:saved}}).then(r =>{
-                res.status(202).json({})
+                res.status(202).json({message:'Ok'})
             }).catch(e =>{
                 console.log(e)
-                res.status(404)
+                res.status(404).json({message:'F'})
             })
         }).catch(e=>{
             console.log(e)
-            res.status(500).json('Error')
+            res.status(500).json({message:'Error'})
         })
     } else {
-        res.status(404).json('Debe estar logueado')
+        res.status(404).json({message:'Debe estar logueado'})
     }
 }
 export const timeline = async (req,res) => {

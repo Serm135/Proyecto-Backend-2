@@ -1,5 +1,4 @@
 import app from '../app.js';
-import requestdb from '../models/request.model.js'
 import request from 'supertest';
 import mongoose from "mongoose";
 

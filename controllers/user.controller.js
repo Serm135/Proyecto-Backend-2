@@ -64,7 +64,8 @@ export const register = async (req,res) => {
                             birthdate: data.birthdate,
                             bio: data.bio,
                             likeallowed: true,
-                            savedposts:[]
+                            savedposts:[],
+                            followed:[]
                         })
                         newuser.save().then(result =>{
                             accessToken = generateAccessToken(data.username)
