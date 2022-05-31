@@ -23,7 +23,7 @@ export const create_comment = async (req,res) => {
                 })
     
         } else {
-            res.status(404).json('Faltan campos por llenar')
+            res.status(400).json('Faltan campos por llenar')
         }
     } else {
         if (data.post_id && data.comment) {
@@ -31,7 +31,7 @@ export const create_comment = async (req,res) => {
                 let comments = dataDB.comments
                 comments.push(data.comment)
                 Post.updateOne({_id:data.post_id},{$set:{comments:comments}}).then(r =>{
-                    res.status(202).json({message:'Ok'})
+                    res.status(200).json({message:'Ok'})
                 }).catch(e =>{
                     console.log(e)
                     res.status(500)
@@ -41,7 +41,7 @@ export const create_comment = async (req,res) => {
                 res.status(404)
             })
         } else {
-            res.status(404).json('Faltan campos por llenar')
+            res.status(400).json('Faltan campos por llenar')
         }
         
     }
@@ -60,7 +60,7 @@ export const information = async (req,res) => {
                         likes: dataDB.likes.length,
                         comments: dataDB.comments
                     }
-                    res.status(202).json({message:'Ok',post_info})
+                    res.status(200).json({message:'Ok',post_info})
                 } else {
                     res.status(404).json({message:'No se encontró la publicación'})
                 }
@@ -104,7 +104,7 @@ export const like = async (req, res) =>{
                     if (!likes.find(like =>{return like==decoded})) {
                         likes.push(decoded)
                         Post.updateOne({_id:data.post_id},{$set:{likes:likes}}).then(r =>{
-                            res.status(202).json({})
+                            res.status(200).json({})
                         }).catch(e =>{
                             console.log(e)
                             res.status(404)
@@ -137,7 +137,7 @@ export const liked_by = async (req, res) => {
                                     return post
                                 }
                             })
-                            res.status(202).json({message:'Ok',likedposts})
+                            res.status(200).json({message:'Ok',likedposts})
                         } else {
                             res.status(404).json({message:'F'})
                         } 
@@ -156,7 +156,7 @@ export const liked_by = async (req, res) => {
             res.status(404).json({message:'No se encontró al usuario'})
         })
     } else {
-        res.status(404).json({message:'User id incorrecto'})
+        res.status(400).json({message:'User id incorrecto'})
     }
 }
 export const saved_by = async (req, res) => {
@@ -177,14 +177,14 @@ export const saved_by = async (req, res) => {
                             }
                         })
                     })
-                    res.status(202).json({message:'Ok',savedposts})
+                    res.status(200).json({message:'Ok',savedposts})
                 }).catch(e=>{
                     console.log(e)
                     res.status(404).json('No hay publicaciones')
                 })
         }).catch(e=>{
             console.log(e)
-            res.status(500).json('Error')
+            res.status(404).json('Error')
         })
     } else {
         res.status(404).json('Debe estar logueado')
@@ -203,14 +203,14 @@ export const save = async (req, res) => {
             let saved = dataDB.savedposts
             saved.push(data.post_id)
             User.updateOne({_id:dataDB._id},{$set:{savedposts:saved}}).then(r =>{
-                res.status(202).json({message:'Ok'})
+                res.status(200).json({message:'Ok'})
             }).catch(e =>{
                 console.log(e)
-                res.status(404).json({message:'F'})
+                res.status(406).json({message:'F'})
             })
         }).catch(e=>{
             console.log(e)
-            res.status(500).json({message:'Error'})
+            res.status(404).json({message:'Error'})
         })
     } else {
         res.status(404).json({message:'Debe estar logueado'})
@@ -230,7 +230,7 @@ export const timeline = async (req,res) => {
             res.status(404).json({})
         }
         await Post.find({author:decoded}).skip((page.page-1)*page.size).limit(page.size).then(dataDB => {
-            res.status(202).json(dataDB)
+            res.status(200).json(dataDB)
         }).catch(e=>{
             console.log(e)
             res.status(404)

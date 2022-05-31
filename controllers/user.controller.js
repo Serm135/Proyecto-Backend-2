@@ -17,12 +17,12 @@ export const login = async (req,res) => {
                 User.find({username:data.username,password: hash}).then(dataDB=>{
                 if(dataDB!=''){
                     accessToken = generateAccessToken(data.username)
-                    res.status(202).header('authorization',accessToken).json({
+                    res.status(200).header('authorization',accessToken).json({
                         message:'Usuario autenticado',
                         token:accessToken
                     })
                 }else{
-                    res.status(404).send({message:'Contraseña incorrecta'})
+                    res.status(400).send({message:'Contraseña incorrecta'})
                 }
                 }).catch(e=>{
                 console.log(e)
@@ -71,7 +71,7 @@ export const register = async (req,res) => {
                         })
                         newuser.save().then(result =>{
                             accessToken = generateAccessToken(data.username)
-                            res.status(202).header('authorization',accessToken).json({
+                            res.status(200).header('authorization',accessToken).json({
                             message:'Usuario autenticado',
                             token:accessToken
                         })
@@ -95,7 +95,7 @@ export const register = async (req,res) => {
             })
         })
     }else{
-        res.status(404).json({
+        res.status(400).json({
             message:'Faltan campos por llenar'
         })
     }
@@ -121,7 +121,7 @@ export const information = async (req,res) => {
                     followed_count: (dataDB.followed).length
 
                 }
-                res.status(202).json({message:'Ok',info})
+                res.status(200).json({message:'Ok',info})
             }).catch(e=>{
                 console.log(e)
             })

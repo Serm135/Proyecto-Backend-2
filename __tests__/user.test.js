@@ -24,7 +24,7 @@ describe("user route tests", () => {
             bio:"test"
         }
         const {status, _body: body} = await request(app).post('/users/').send(user)
-        expect(status).toBe(202)    
+        expect(status).toBe(200)    
         expect(body.message).toBe("Usuario autenticado")
     })
 
@@ -36,7 +36,7 @@ describe("user route tests", () => {
             bio:"Juego al LoL y por eso me odio"
         }
         const {status, _body: body} = await request(app).post('/users/').send(user)
-        expect(status).toBe(404)    
+        expect(status).toBe(400)    
         expect(body.message).toBe("Faltan campos por llenar")
     })
 
@@ -56,7 +56,7 @@ describe("user route tests", () => {
             password: "12"
         }
         const {status, _body: body} = await request(app).post('/users/login').send(user)
-        expect(status).toBe(404)    
+        expect(status).toBe(400)    
         expect(body.message).toBe("Contraseña incorrecta")
     })
 
@@ -66,7 +66,7 @@ describe("user route tests", () => {
             password: "1234"
         }
         const {status, _body: body} = await request(app).post('/users/login').send(user)
-        expect(status).toBe(202)    
+        expect(status).toBe(200)    
         expect(body.message).toBe("Usuario autenticado")
     })
 
@@ -75,7 +75,7 @@ describe("user route tests", () => {
             user_id: '6292a3cfe25b6e63c08ab029'
         }
         const {status, _body: body} = await request(app).get('/users/').send(user)
-        expect(status).toBe(202)    
+        expect(status).toBe(200)    
         expect(body.message).toBe("Ok")
         expect(body.info.birthdate).toBeUndefined()
         expect(body.info.password).toBeUndefined()

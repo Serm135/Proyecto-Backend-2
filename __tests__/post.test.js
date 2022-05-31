@@ -25,7 +25,7 @@ describe("post route tests", () => {
             post_id: '62929215f15dd388a1f896a6'
         }
         const {status} = await request(app).post('/posts/like').send(post)
-        expect(status).toBe(202)    
+        expect(status).toBe(200)    
     })
 
     test('/liked-by', async () => {
@@ -35,7 +35,7 @@ describe("post route tests", () => {
         }
         await request(app).post('/users/login').send(user)
         const {status,_body:body} = await request(app).get('/posts/liked-by?user_id=6292a3cfe25b6e63c08ab029')
-        expect(status).toBe(202)   
+        expect(status).toBe(200)   
         expect(body.message).toBe('Ok') 
     })
 
@@ -49,7 +49,7 @@ describe("post route tests", () => {
             post_id: '62929215f15dd388a1f896a6'
         }
         const {status,_body:body} = await request(app).post('/posts/save').send(info)
-        expect(status).toBe(202)   
+        expect(status).toBe(200)   
         expect(body.message).toBe('Ok') 
     })
 
@@ -60,7 +60,7 @@ describe("post route tests", () => {
         }
         await request(app).post('/users/login').send(user)
         const {status,_body:body} = await request(app).get('/posts/saved-by')
-        expect(status).toBe(202)   
+        expect(status).toBe(200)   
         expect(body.message).toBe('Ok') 
     })
 
@@ -75,7 +75,7 @@ describe("post route tests", () => {
             comment: 'Confirmo, petrosky moment'
         }
         const {status,_body:body} = await request(app).post('/posts/').send(info)
-        expect(status).toBe(202)   
+        expect(status).toBe(200)   
         expect(body.message).toBe('Ok') 
     })
 
@@ -89,7 +89,7 @@ describe("post route tests", () => {
             post_id: '62929215f15dd388a1f896a6'
         }
         const {status,_body:body} = await request(app).get('/posts/').send(info)
-        expect(status).toBe(202)   
+        expect(status).toBe(200)   
         expect(body.message).toBe('Ok') 
     })
 

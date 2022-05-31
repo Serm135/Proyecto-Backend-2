@@ -16,9 +16,9 @@ export const following = async (req,res) => {
                 if(dataDB){
                     const users = dataDB.followed
                     if(dataDB.username==decoded){
-                        res.status(202).json({message:'Ok',users})
+                        res.status(200).json({message:'Ok',users})
                     }else if((dataDB.followed).find(item=>item=decoded)){
-                        res.status(202).json({message:'Ok',users})
+                        res.status(200).json({message:'Ok',users})
                     }else{
                         res.status(404).json('El usuario no lo sigue')
                     }
@@ -52,7 +52,7 @@ export const followers = async (req,res) => {
                     if(dataDB.username==decoded){
                         User.find({followed:dataDB.username}).then(dataDBf=>{
                             const users = dataDBf.map(item=>item.username)
-                            res.status(202).json({message:'Ok',users})
+                            res.status(200).json({message:'Ok',users})
                         }).catch(e=>{
                             console.log(e)
                             res.status(404).json(e)
@@ -60,7 +60,7 @@ export const followers = async (req,res) => {
                     }else if((dataDB.followed).find(item=>item=decoded)){
                         User.find({followed:dataDB.username}).then(dataDBf=>{
                             const users = dataDBf.map(item=>item.username)
-                            res.status(202).json({message:'Ok',users})
+                            res.status(200).json({message:'Ok',users})
                         }).catch(e=>{
                             console.log(e)
                             res.status(404).json(e)
@@ -105,7 +105,7 @@ export const request = async(req,res) => {
                                 to: dataDB.username
                             })
                             newreq.save().then(r=>{
-                                res.status(202).json({message:'Realizado Correctamente'})
+                                res.status(200).json({message:'Realizado Correctamente'})
                             }).catch(e=>{
                                 console.log(e)
                                 res.status(500).json({
@@ -147,10 +147,10 @@ export const response = async(req,res) => {
                         if(data.action=='accept'){ 
                             User.updateOne({username:dataDB.from},{$push:{followed:[dataDB.to]}}).then(result=>{
                                 Request.deleteOne({from:dataDB.from},{to:dataDB.to}).then(
-                                    res.status(202).json({message:'Realizado Correctamente'})
+                                    res.status(200).json({message:'Realizado Correctamente'})
                                 ).catch(e=>{
                                     console.log(e)
-                                    res.status(500).json({
+                                    res.status(400).json({
                                         error:e
                                     })
                                 })
@@ -162,7 +162,7 @@ export const response = async(req,res) => {
                             })
                         }else if(data.action=='reject'){
                             Request.deleteOne({from:dataDB.from},{to:dataDB.to}).then(
-                                res.status(202).json({message:'Realizado Correctamente'})
+                                res.status(200).json({message:'Realizado Correctamente'})
                             ).catch(e=>{
                                 console.log(e)
                                 res.status(500).json({

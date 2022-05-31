@@ -24,13 +24,13 @@ describe("follow route tests", () => {
         }
         await request(app).post('/users/login').send(user)
         const {status, _body: body} = await request(app).get('/follows/followers?user_id=6293d8b73ed8c34141ee6c62')
-        expect(status).toBe(202)    
+        expect(status).toBe(200)    
         expect(body.message).toBe("Ok")
     })
 
     test('/following', async () => {
         const {status, _body: body} = await request(app).get('/follows/following?user_id=6293d8b73ed8c34141ee6c62')
-        expect(status).toBe(202)    
+        expect(status).toBe(200)    
         expect(body.message).toBe("Ok")
     })
     
@@ -39,7 +39,7 @@ describe("follow route tests", () => {
             user_id: '6292919ff15dd388a1f896a4'
         }
         const {status, _body: body} = await request(app).post('/follows/request').send(info)
-        expect(status).toBe(202)    
+        expect(status).toBe(200)    
         expect(body.message).toBe("Realizado Correctamente")
     })
 
@@ -54,10 +54,10 @@ describe("follow route tests", () => {
             password: "2222"
         }
         const {status:statusl, _body: bodyl} = await request(app).post('/users/login').send(user)
-        expect(statusl).toBe(202)    
+        expect(statusl).toBe(200)    
         expect(bodyl.message).toBe("Usuario autenticado")
         const {status, _body: body} = await request(app).post('/follows/response').send(info)
-        expect(status).toBe(202)    
+        expect(status).toBe(200)    
         expect(body.message).toBe("Realizado Correctamente")
         const {status:statusf, _body: bodyf} = await request(app).post('/follows/response').send(info)
         expect(statusf).toBe(404)    
@@ -74,7 +74,7 @@ describe("follow route tests", () => {
             user_id: '6292919ff15dd388a1f896a4'
         }
         const {status:statusI, _body: bodyI} = await request(app).post('/follows/request').send(info1)
-        expect(statusI).toBe(202)
+        expect(statusI).toBe(200)
         expect(bodyI.message).toBe("Realizado Correctamente")
         const requestres = await requestdb.findOne({from:'pinilloss',to:'juan'})
         const info = {
@@ -87,7 +87,7 @@ describe("follow route tests", () => {
         }
         await request(app).post('/users/login').send(user)
         const {status, _body: body} = await request(app).post('/follows/response').send(info)
-        expect(status).toBe(202)    
+        expect(status).toBe(200)    
         expect(body.message).toBe("Realizado Correctamente")
         const {status:statusf, _body: bodyf} = await request(app).post('/follows/response').send(info)
         expect(statusf).toBe(404)    
